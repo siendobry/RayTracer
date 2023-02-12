@@ -16,10 +16,11 @@ class Sphere(
         if (delta < 0 || t < minT || t > maxT) {
             return false
         }
+        hitRecord.hitBy = r
         hitRecord.t = t
-        hitRecord.normal = (r.at(t) - center) / radius
+        val outwardNormal = (r.at(t) - center) / radius
         hitRecord.material = material
-        hitRecord.setHitSide(r)
+        hitRecord.setHitSideNormal(outwardNormal)
         return true
     }
 

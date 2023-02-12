@@ -1,10 +1,11 @@
 class Diffuse(
-    albedo : Colour
+    albedo : Colour,
+    reflectance : Double
 ) : Material(albedo) {
 
-    override fun scatter(ray: Ray, hr: HitRecord, scatteredRay : Ray): Boolean {
-        val hitPoint = ray.at(hr.t)
-        val scatterDirection = hitPoint + hr.normal + getRandomUnit()
+    override fun scatter(hr: HitRecord, scatteredRay : Ray): Boolean {
+        val hitPoint = hr.hitBy.at(hr.t)
+        val scatterDirection = hr.normal + getRandomUnit()
         scatteredRay.origin = hitPoint
         scatteredRay.direction = scatterDirection
         if (scatterDirection.nearZero()) scatteredRay.direction = hr.normal

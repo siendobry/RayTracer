@@ -1,18 +1,14 @@
 class Metal(
     albedo : Colour,
-    private val fuzz : Double
-) : Material(albedo) {
+    reflectance : Double,
+    refractiveIndex : Double,
+    diffusionFactor : Double
+) : Diffusive(albedo, reflectance, refractiveIndex, diffusionFactor) {
 
-    init {
-        if (fuzz < 0 || fuzz > 1) {
-            throw IllegalArgumentException("Fuzz has to be in range 0 to 1")
-        }
-    }
-
-    override fun scatter(ray: Ray, hr: HitRecord, scatteredRay: Ray): Boolean {
-        val scatteredRayData = ray.getReflection(hr)
+    override fun scatter(hr: HitRecord, scatteredRay: Ray): Boolean {
+        val scatteredRayData = hr.hitBy.getReflection(hr)
         scatteredRay.origin = scatteredRayData.origin
-        scatteredRay.direction = scatteredRayData.direction + fuzz * getRandomUnit()
+        scatteredRay.direction = super.applyDiffusion(scatteredRayData.direction)
         return (dot(scatteredRay.direction, hr.normal) > 0)
     }
 

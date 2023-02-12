@@ -1,5 +1,3 @@
-import kotlin.random.Random
-
 // Vector3d / Point3d
 
 operator fun Double.times(v : Vector3d) = v * this
@@ -17,3 +15,5 @@ fun clamp(x : Double, min : Double, max : Double) : Double {
     else if (x > max) return max
     return x
 }
+
+fun degToRad(deg : Int) = deg * Math.PI / 180

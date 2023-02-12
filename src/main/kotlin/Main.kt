@@ -1,4 +1,8 @@
+import java.io.File
+import kotlin.math.round
 import kotlin.random.Random
+
+import kotlinx.coroutines.*
 
 fun colourRay(r : Ray, world : EntityList, maxDepth : Int) : Colour {
     if (maxDepth <= 0) {
@@ -7,8 +11,8 @@ fun colourRay(r : Ray, world : EntityList, maxDepth : Int) : Colour {
     val closestHit = world.getClosestHit(r)
     if (closestHit != null) {
         val scatteredRay = Ray()
-        if (closestHit.material.scatter(r, closestHit, scatteredRay)) {
-            return mix(closestHit.material.getAlbedo(), colourRay(scatteredRay, world, maxDepth - 1))
+        if (closestHit.material.scatter(closestHit, scatteredRay)) {
+            return mix(closestHit.material.albedo, colourRay(scatteredRay, world, maxDepth - 1))
         }
         return Colour(0.0, 0.0, 0.0)
     }
@@ -19,23 +23,28 @@ fun colourRay(r : Ray, world : EntityList, maxDepth : Int) : Colour {
 
 fun main() {
     try {
-        val camera = Camera()
+        val camera = Camera(Point3d(0.0, 0.0, 0.0), Point3d(0.0, 0.0, -1.0), Vector3d(0.0, 1.0, 0.0), 90, 16.0 / 9, 0.01, 1.0)
         val width = 1280
         val height = (width / camera.aspectRatio).toInt()
-        val samplesCount = 100
+        val samplesCount = 1000
         val maxDepth = 50
         val world = EntityList()
 
-        val materialGround = Diffuse(Colour(0.8, 0.8, 0.0))
-        val materialCenter = Diffuse(Colour(0.7, 0.3, 0.3))
-        val materialLeft = Metal(Colour(0.6, 0.6, 0.6), 0.1)
-        val materialRight = Metal(Colour(0.8, 0.6, 0.2), 0.3)
+        val filename = "result.ppm"
+
+        val materialGround = Diffuse(Colour(0.8, 0.8, 0.0), 0.1)
+        val materialCenter = Diffuse(Colour(0.1, 0.2, 0.5), 0.1)
+        val materialLeft = Dielectric(Colour(1.0, 0.7, 0.7), 1.0, 1.5, 1.0)
+        val materialRight = Metal(Colour(0.8, 0.6, 0.2), 0.3, 1.0, 0.0)
         world.add(Sphere(Point3d(0.0, 0.0, -1.0), 0.5, materialCenter))
         world.add(Sphere(Point3d(1.0, 0.0, -1.0), 0.5, materialRight))
         world.add(Sphere(Point3d(-1.0, 0.0, -1.0), 0.5, materialLeft))
+//        world.add(Sphere(Point3d(-1.0, 0.0, -1.0), -0.45, materialLeft))
         world.add(Sphere(Point3d(0.0, -100.5, -1.0), 100.0, materialGround))
 
-        println("P3\n$width $height\n255\n")
+        val file = File(filename)
+        file.writeText("P3\n$width $height\n255\n\n")
+//        println("P3\n$width $height\n255\n")
         for (j in height - 1 downTo 0) {
             for (i in 0 until width) {
                 var pixelColour = Colour(0.0, 0.0, 0.0)
@@ -45,8 +54,10 @@ fun main() {
                     val r = camera.getRay(u, v)
                     pixelColour += colourRay(r, world, maxDepth)
                 }
-                println(pixelColour.write(255, samplesCount))
+                file.appendText("${pixelColour.write(255, samplesCount)}\n")
+//                println(pixelColour.write(255, samplesCount))
             }
+            println("${round((height - 1 - j) * 10000.0 / height) / 100}%")
         }
     }
     catch (e : Exception) {

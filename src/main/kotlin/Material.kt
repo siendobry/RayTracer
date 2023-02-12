@@ -1,11 +1,7 @@
 abstract class Material(
-    private val albedo : Colour
+    val albedo : Colour
 ) {
 
-    abstract fun scatter(ray: Ray, hr : HitRecord, scatteredRay : Ray) : Boolean
-
-    fun getAlbedo() : Colour {
-        return albedo
-    }
+    abstract fun scatter(hr : HitRecord, scatteredRay : Ray) : Boolean
 
 }
