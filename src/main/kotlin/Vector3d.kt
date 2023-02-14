@@ -40,6 +40,13 @@ data class Vector3d(
 
     fun nearZero() = length() < (10.0).pow(-8)
 
+    companion object {
+        fun parse(data : String) : Vector3d {
+            val (x, y, z) = data.split(",").onEach { it.trim() }
+            return Vector3d(x.toDouble(), y.toDouble(), z.toDouble())
+        }
+    }
+
 }
 
 fun dot(a : Vector3d, b : Vector3d) : Double{

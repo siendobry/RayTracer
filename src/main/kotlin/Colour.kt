@@ -1,9 +1,9 @@
 import kotlin.math.sqrt
 
 data class Colour(
-    val r : Double,
-    val g : Double,
-    val b : Double
+    var r : Double,
+    var g : Double,
+    var b : Double
 ) {
 
     // it would be good to put a constraint on rgb values,
@@ -22,6 +22,12 @@ data class Colour(
 
     operator fun plus(other : Colour) = Colour(r + other.r, g + other.g, b + other.b)
 
+    operator fun plusAssign(other: Colour) {
+        r += other.r
+        g += other.g
+        b += other.b
+    }
+
     operator fun times(multiplier : Double) = Colour(r * multiplier, g * multiplier, b * multiplier)
 
     operator fun times(multiplier : Int) = times(multiplier.toDouble())
@@ -36,6 +42,20 @@ data class Colour(
         val finalB = clamp(b / samplesCount, 0.0, 1.0)
         return "${(sqrt(finalR) * maxVal).toInt()} ${(sqrt(finalG) * maxVal).toInt()} ${(sqrt(finalB) * maxVal).toInt()}"
     }
+
+    fun getClamped() : Colour {
+        return Colour(clamp(r, 0.0, 1.0),
+                      clamp(g, 0.0, 1.0),
+                      clamp(b, 0.0, 1.0))
+    }
+
+    companion object {
+        fun parse(data : String) : Colour {
+            val (r, g, b) = data.split(",").onEach { it.trim() }
+            return Colour(r.toDouble(), g.toDouble(), b.toDouble())
+        }
+    }
+
 }
 
 fun mix(c1 : Colour, c2 : Colour) = Colour(c1.r * c2.r, c1.g * c2.g, c1.b * c2.b)

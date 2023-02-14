@@ -1,30 +1,30 @@
 import kotlin.math.tan
 
 class Camera(
-    val lookfrom : Point3d,
-    val lookat : Point3d,
-    val vup : Vector3d,
+    lookfrom : Point3d,
+    lookat : Point3d,
+    vup : Vector3d,
     vfov : Int,
-    val aspectRatio : Double,
+    aspectRatio : Double,
     aperture : Double,
-    val focusDist : Double
+    focusDist : Double
 ) {
 
-    val theta = degToRad(vfov)
-    val h = tan(theta / 2)
-    val viewportHeight = 2.0 * h
-    val viewportWidth = viewportHeight * aspectRatio
+    private val theta = degToRad(vfov)
+    private val h = tan(theta / 2)
+    private val viewportHeight = 2.0 * h
+    private val viewportWidth = viewportHeight * aspectRatio
 
-    val w = (lookfrom - lookat).normalized()
-    val u = cross(vup, w).normalized()
-    val v = cross(w, u)
+    private val w = (lookfrom - lookat).normalized()
+    private val u = cross(vup, w).normalized()
+    private val v = cross(w, u)
 
-    val origin = lookfrom
-    val horizontal = focusDist * viewportWidth * u
-    val vertical = focusDist * viewportHeight * v
-    val lowerLeftCorner = origin - horizontal / 2.0 - vertical / 2.0 - focusDist * w
+    private val origin = lookfrom
+    private val horizontal = focusDist * viewportWidth * u
+    private val vertical = focusDist * viewportHeight * v
+    private val lowerLeftCorner = origin - horizontal / 2.0 - vertical / 2.0 - focusDist * w
 
-    val lensRadius = aperture / 2
+    private val lensRadius = aperture / 2
 
     fun getRay(s : Double, t : Double) : Ray {
         val rand = lensRadius * getRandomDisk()

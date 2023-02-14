@@ -12,16 +12,24 @@ class Sphere(
         val b = 2 * dot(r.direction, oc)
         val c = dot(oc, oc) - radius * radius
         val delta = b * b - 4 * a * c
+        if (delta < 0) return false
         val t = (-b - sqrt(delta)) / (2 * a)
-        if (delta < 0 || t < minT || t > maxT) {
-            return false
-        }
+        if (t < minT || t > maxT) return false
         hitRecord.hitBy = r
         hitRecord.t = t
         val outwardNormal = (r.at(t) - center) / radius
         hitRecord.material = material
         hitRecord.setHitSideNormal(outwardNormal)
         return true
+    }
+
+    companion object {
+        fun parse(data: String): Sphere {
+            val params = data.split(";", limit = 3).onEach { it.trim() }
+            val center = Point3d.parse(params[0])
+            val radius = params[1].toDouble()
+            return Sphere(center, radius, Material.parse(params[2]))
+        }
     }
 
 }
